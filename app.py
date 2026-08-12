@@ -34,11 +34,10 @@ def f1(y_true, y_pred):
 def load_dr_model():
     st.info("Loading model... please wait")
     model_path = hf_hub_download(
-        repo_id  = "kithinjibrian95/aptos-resnet50",
-        filename = "resnet50_aptos_best.keras"
+        repo_id="kithinjibrian95/aptos-resnet50",
+        filename="resnet50_aptos_best.keras"
     )
-   model = load_model(model_path, compile=False)
-    )
+    model = load_model(model_path, compile=False)
     return model
 
 # ── LABELS ───────────────────────────────────────────────────
