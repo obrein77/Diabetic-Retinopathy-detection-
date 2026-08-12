@@ -2,32 +2,15 @@ import streamlit as st
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-from tensorflow.keras import backend as K
 from PIL import Image
 from huggingface_hub import hf_hub_download
 
 # ── PAGE CONFIG ──────────────────────────────────────────────
 st.set_page_config(
-    page_title = "APTOS DR Detection",
-    page_icon  = "🔬",
-    layout     = "centered"
+    page_title="APTOS DR Detection",
+    page_icon="🔬",
+    layout="centered"
 )
-
-# ── CUSTOM METRICS ───────────────────────────────────────────
-def recall(y_true, y_pred):
-    tp = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-    pp = K.sum(K.round(K.clip(y_true, 0, 1)))
-    return tp / (pp + K.epsilon())
-
-def precision(y_true, y_pred):
-    tp = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-    pt = K.sum(K.round(K.clip(y_pred, 0, 1)))
-    return tp / (pt + K.epsilon())
-
-def f1(y_true, y_pred):
-    p = precision(y_true, y_pred)
-    r = recall(y_true, y_pred)
-    return 2 * ((p * r) / (p + r + K.epsilon()))
 
 # ── LOAD MODEL FROM HUGGING FACE ─────────────────────────────
 @st.cache_resource
@@ -37,7 +20,7 @@ def load_dr_model():
         repo_id="kithinjibrian95/aptos-resnet50",
         filename="resnet50_aptos_best.keras"
     )
-    model = load_model(model_path, compile=False)
+    model = load_model(model_path, compile=False, safe_mode=False)
     return model
 
 # ── LABELS ───────────────────────────────────────────────────
@@ -50,24 +33,24 @@ LABELS = [
 ]
 
 DESCRIPTIONS = {
-    "No DR"            : "No signs of diabetic retinopathy detected.",
-    "Mild DR"          : "Mild non-proliferative DR. Small microaneurysms present.",
-    "Moderate DR"      : "Moderate non-proliferative DR. More widespread changes.",
-    "Severe DR"        : "Severe non-proliferative DR. Urgent medical attention needed.",
-    "Proliferative DR" : "Proliferative DR. Advanced stage. Immediate treatment required."
+    "No DR": "No signs of diabetic retinopathy detected.",
+    "Mild DR": "Mild non-proliferative DR. Small microaneurysms present.",
+    "Moderate DR": "Moderate non-proliferative DR. More widespread changes.",
+    "Severe DR": "Severe non-proliferative DR. Urgent medical attention needed.",
+    "Proliferative DR": "Proliferative DR. Advanced stage. Immediate treatment required."
 }
 
 COLORS = {
-    "No DR"            : "🟢",
-    "Mild DR"          : "🟡",
-    "Moderate DR"      : "🟠",
-    "Severe DR"        : "🔴",
-    "Proliferative DR" : "🚨"
+    "No DR": "🟢",
+    "Mild DR": "🟡",
+    "Moderate DR": "🟠",
+    "Severe DR": "🔴",
+    "Proliferative DR": "🚨"
 }
 
 # ── PREDICTION FUNCTION ───────────────────────────────────────
 def predict(img):
-    img       = img.resize((224, 224))
+    img = img.resize((224, 224))
     img_array = np.array(img)
 
     if len(img_array.shape) == 2:
@@ -75,13 +58,13 @@ def predict(img):
     if img_array.shape[-1] == 4:
         img_array = img_array[:, :, :3]
 
-    img_array   = np.expand_dims(img_array.astype(np.float32), axis=0)
-    img_array   = tf.keras.applications.resnet50.preprocess_input(img_array)
+    img_array = np.expand_dims(img_array.astype(np.float32), axis=0)
+    img_array = tf.keras.applications.resnet50.preprocess_input(img_array)
 
-    model       = load_dr_model()
+    model = load_dr_model()
     predictions = model.predict(img_array, verbose=0)
-    result      = np.argmax(predictions[0])
-    confidence  = predictions[0][result] * 100
+    result = np.argmax(predictions[0])
+    confidence = predictions[0][result] * 100
 
     return LABELS[result], confidence, predictions[0]
 
@@ -102,7 +85,7 @@ if uploaded_file is not None:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.image(img, caption="Uploaded Retinal Image", use_column_width=True)
+        st.image(img, caption="Uploaded Retinal Image", use_container_width=True)
 
     with col2:
         with st.spinner("🔍 Analyzing image..."):
