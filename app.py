@@ -33,10 +33,9 @@ def f1(y_true, y_pred):
 @st.cache_resource
 def load_dr_model():
     st.info("Loading model... please wait")
-   model_path = hf_hub_download(
-    repo_id  = "kithinjibrian95/aptos-resnet50",  
-    filename = "resnet50_aptos_best.keras"
-)
+    model_path = hf_hub_download(
+        repo_id  = "kithinjibrian95/aptos-resnet50",
+        filename = "resnet50_aptos_best.keras"
     )
     model = load_model(
         model_path,
