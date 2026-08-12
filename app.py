@@ -37,9 +37,7 @@ def load_dr_model():
         repo_id  = "kithinjibrian95/aptos-resnet50",
         filename = "resnet50_aptos_best.keras"
     )
-    model = load_model(
-        model_path,
-        custom_objects={"f1": f1, "precision": precision, "recall": recall}
+   model = load_model(model_path, compile=False)
     )
     return model
 
